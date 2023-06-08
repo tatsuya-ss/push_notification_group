@@ -16,6 +16,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
+    private var pushNotificationCount = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel()
 
         binding.pushButton.setOnClickListener {
+            pushNotificationCount ++
             val parentNotification = createParentNotification()
             val childNotification = createPushNotification()
             sendNotification(parentNotification, childNotification)
@@ -48,7 +51,7 @@ class MainActivity : AppCompatActivity() {
     private fun createPushNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("ハロー")
+            .setContentTitle("ハロー $pushNotificationCount")
             .setContentText(System.currentTimeMillis().toString())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setGroup(MESSAGE_NOTIFICATION_GROUP)
@@ -68,8 +71,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendNotification(parentNotification: Notification, childNotification: Notification) {
         with(NotificationManagerCompat.from(this)) {
-            notify(1, childNotification)
-            notify(2, childNotification)
+            notify(pushNotificationCount, childNotification)
             notify(PARENT_NOTIFICATION_ID, parentNotification)
         }
     }
