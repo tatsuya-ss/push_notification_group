@@ -1,5 +1,6 @@
 package com.example.push_notification_group
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -23,8 +24,9 @@ class MainActivity : AppCompatActivity() {
         createNotificationChannel()
 
         binding.pushButton.setOnClickListener {
-            val builder = createPushNotificationBuilder()
-            sendNotification(builder)
+            val parentNotification = createParentNotification()
+            val childNotification = createPushNotification()
+            sendNotification(parentNotification, childNotification)
         }
     }
 
@@ -43,24 +45,39 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun createPushNotificationBuilder(): NotificationCompat.Builder {
+    private fun createPushNotification(): Notification {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_launcher_foreground)
             .setContentTitle("ハロー")
-            .setContentText("こんちは")
+            .setContentText(System.currentTimeMillis().toString())
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setGroup(MESSAGE_NOTIFICATION_GROUP)
+            .build()
     }
 
-    private fun sendNotification(builder: NotificationCompat.Builder) {
+    private fun createParentNotification(): Notification {
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setContentTitle("親通知")
+            .setContentText(System.currentTimeMillis().toString())
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setGroup(MESSAGE_NOTIFICATION_GROUP)
+            .setGroupSummary(true)
+            .build()
+    }
+
+    private fun sendNotification(parentNotification: Notification, childNotification: Notification) {
         with(NotificationManagerCompat.from(this)) {
-            notify(NOTIFICATION_ID, builder.build())
+            notify(1, childNotification)
+            notify(2, childNotification)
+            notify(PARENT_NOTIFICATION_ID, parentNotification)
         }
     }
 
     companion object {
         private const val CHANNEL_ID = "0"
-        private const val NOTIFICATION_ID = 0
+        private const val PARENT_NOTIFICATION_ID = 0
+        private const val MESSAGE_NOTIFICATION_GROUP = "message_notification_group"
     }
 }
 
