@@ -27,16 +27,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.pushButton.setOnClickListener {
             pushNotificationCount ++
-            val parentNotification = createParentNotification(MESSAGE_NOTIFICATION_GROUP_A)
             val childNotification = createPushNotification(MESSAGE_NOTIFICATION_GROUP_A)
-            sendNotification(parentNotification, childNotification)
-        }
-
-        binding.pushDifferentButton.setOnClickListener {
-            pushNotificationCount ++
-            val parentNotification = createParentNotification(MESSAGE_NOTIFICATION_GROUP_B)
-            val childNotification = createPushNotification(MESSAGE_NOTIFICATION_GROUP_B)
-            sendNotification(parentNotification, childNotification)
+            sendNotification(childNotification, System.currentTimeMillis().toInt())
         }
     }
 
@@ -65,29 +57,15 @@ class MainActivity : AppCompatActivity() {
             .build()
     }
 
-    private fun createParentNotification(groupId: String): Notification {
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
-            .setContentTitle("親通知")
-            .setContentText(System.currentTimeMillis().toString())
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setGroup(groupId)
-            .setGroupSummary(true)
-            .build()
-    }
-
-    private fun sendNotification(parentNotification: Notification, childNotification: Notification) {
+    private fun sendNotification(childNotification: Notification, notificationId: Int) {
         with(NotificationManagerCompat.from(this)) {
-            notify(pushNotificationCount, childNotification)
-            notify(PARENT_NOTIFICATION_ID, parentNotification)
+            notify(notificationId, childNotification)
         }
     }
 
     companion object {
         private const val CHANNEL_ID = "0"
-        private const val PARENT_NOTIFICATION_ID = 0
         private const val MESSAGE_NOTIFICATION_GROUP_A = "message_notification_group_a"
-        private const val MESSAGE_NOTIFICATION_GROUP_B = "message_notification_group_b"
     }
 }
 
